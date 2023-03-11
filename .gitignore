@@ -1,6 +1,9 @@
 # Api Keys
 keychain.py
 
+#recordings
+recording.wav
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
