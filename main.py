@@ -1,17 +1,10 @@
-import pyaudio
-import wave
-import threading
-import keyboard
-import os
+import pyaudio, wave
+import threading, keyboard, os, sys
 import openai
-import time
-import pyduinocli
-import subprocess
-import sys
 
-import config #this file contains the openai api key
+import config #this file contains the openai api key and board configuration
 
-# Set up audio parameters
+# Audio refording parameters
 chunk = 1024
 sample_format = pyaudio.paInt16
 channels = 1
@@ -114,16 +107,6 @@ def process_gpt_output(output):
     print(output)
     #content.strip('\n\n```').strip("c++").strip("C++").strip("arduino").strip("Arduino")
     return output
-
-def run_arduino_code():
-    #arduino = pyduinocli.Arduino("./arduino-cli")
-    print("waiting...")
-    time.sleep(10)
-    print("compiling arduino code")
-    os.system("arduino-cli compile -b arduino:avr:leonardo arduino_code --verbose")
-    time.sleep(6)
-    print("uploading arduino code")
-    os.system("arduino-cli upload -b arduino:avr:leonardo -p /dev/tty.usbmodem143401 arduino_code --verbose")
 
 # Start the keyboard listener
 listen()
