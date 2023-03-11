@@ -2,7 +2,8 @@ import pyaudio, wave
 import threading, keyboard, os, sys
 import openai
 
-import config #this file contains the openai api key and board configuration
+import thread # This is where the conversation with the user is stored
+import config # This file contains the openai api key and board configuration
 
 # Audio refording parameters
 chunk = 1024
@@ -15,34 +16,37 @@ recording = False
 openai.api_key = config.openai_key
 openai.Model.list()
 
-# Define the audio recording function
+# This function records audio from the microphone
 def record():
     global frames, recording
     p = pyaudio.PyAudio()
-    stream = p.open(format=sample_format,
-                    channels=channels,
-                    rate=rate,
-                    frames_per_buffer=chunk,
-                    input=True)
+
+    stream = p.open(format=sample_format, channels=channels, rate=rate, frames_per_buffer=chunk, input=True)
     frames = []
     recording = True
+
     while recording:
         data = stream.read(chunk)
         frames.append(data)
+
     stream.stop_stream()
     stream.close()
     p.terminate()
 
-# Define the keyboard listener function
+# This function listens for keyboard input
 def listen():
     global recording
     while True:
         if keyboard.is_pressed('r'):
             print('Recording...')
-            record_thread = threading.Thread(target=record)
+
+            # Calling the record function on a different thread
+            record_thread = threading.Thread(target=record) 
             record_thread.start()
+
             while keyboard.is_pressed('r'):
                 pass
+
             recording = False
             record_thread.join()
             print('Recording stopped.')
