@@ -1,1 +1,1 @@
-api_key = "INSERT YOUR API KEY HERE"
+openai_key = "insert your openai key here"

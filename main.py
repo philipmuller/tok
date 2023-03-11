@@ -10,7 +10,6 @@ import subprocess
 import sys
 
 import config #this file contains the openai api key
-import board_config #this file contains the board config
 
 # Set up audio parameters
 chunk = 1024
@@ -20,7 +19,7 @@ rate = 44100
 frames = []
 recording = False
 
-openai.api_key = config.api_key
+openai.api_key = config.openai_key
 openai.Model.list()
 
 # Define the audio recording function
