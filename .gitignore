@@ -1,8 +1,11 @@
 # Api Keys
 keychain.py
 
-#recordings
+# Recordings
 recording.wav
+
+# Arduino code
+arduino_code/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
