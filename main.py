@@ -74,12 +74,15 @@ def create_transcription():
     transcript = openai.Audio.transcribe("whisper-1", audio_file)
     text = transcript["text"]
     print(text)
-    generate_arduino_code_test(text)
+    if config.iterative:
+        generate_arduino_code_test(text)
+    else:
+        generate_arduino_code(text)
 
 def generate_arduino_code(prompt):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        temperature=0.4,
+        temperature=config.temperature,
         messages=[
         {"role": "system", "content": "You are assisting a human with writing Arduino code. The Arduino is a Arduino Leonardo. You always have to output complete arduino code without additional text. Don't reply with anything but the code itself. Don't talk to the user directly, don't explain your code, just output the code itself. This is the request from the user:"},
         {"role": "user", "content": prompt}
@@ -126,7 +129,7 @@ def generate_arduino_code_test(prompt):
 
     response = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
-    temperature=0.4,
+    temperature=config.temperature,
     messages=messages
     )
     print(response)
