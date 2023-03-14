@@ -25,7 +25,7 @@ def record():
     recording = True
 
     while recording:
-        data = stream.read(chunk)
+        data = stream.read(chunk, exception_on_overflow = False)
         frames.append(data)
 
     stream.stop_stream()
