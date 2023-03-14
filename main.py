@@ -2,7 +2,6 @@ import pyaudio, wave
 import threading, keyboard, os, sys
 import openai
 
-import thread # This is where the conversation with the user is stored
 import config # This file contains the openai api key and board configuration
 
 # Audio refording parameters
