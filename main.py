@@ -159,7 +159,7 @@ def write_to_arduino_file(content):
     f.close()
     print("Saved new arduino file!")
     sys.exit("Generation ended")
-    #run_arduino_code()
+    run_arduino_code()
 
 def process_gpt_output(output):
     substrings = output.split("```")
@@ -168,6 +168,10 @@ def process_gpt_output(output):
     print(output)
     #content.strip('\n\n```').strip("c++").strip("C++").strip("arduino").strip("Arduino")
     return output
+
+def run_arduino_code():
+    os.system("sudo arduino-cli compile --fqbn arduino:avr:leonardo arduino_code")
+    os.system("sudo arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:leonardo arduino_code")
 
 # Start the keyboard listener
 listen()
