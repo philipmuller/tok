@@ -1,1 +1,0 @@
-openai_key = "insert your openai key here"

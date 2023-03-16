@@ -6,7 +6,7 @@ import config # This file contains the openai api key and board configuration
 import json
 
 # Audio refording parameters
-chunk = 1024
+chunk = 512
 sample_format = pyaudio.paInt16
 channels = 1
 rate = 44100
