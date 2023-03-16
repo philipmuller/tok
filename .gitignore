@@ -7,6 +7,9 @@ recording.wav
 # Arduino code
 arduino_code/
 
+# Context
+context/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
