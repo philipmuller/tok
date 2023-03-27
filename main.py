@@ -40,14 +40,14 @@ def record():
 def listen():
     global recording
     while True:
-        if keyboard.is_pressed('r'):
+        if gpio.input(port.GPIO23) == 1:
             print('Recording...')
 
             # Calling the record function on a different thread
             record_thread = threading.Thread(target=record) 
             record_thread.start()
 
-            while keyboard.is_pressed('r'):
+            while gpio.input(port.GPIO23) == 1:
                 pass
 
             recording = False
@@ -177,7 +177,8 @@ def run_arduino_code():
     os.system("sudo arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:leonardo arduino_code")
 
 gpio.init()
-gpio.setcfg(port.GPIO24, 1)  #gpio4 as output
+gpio.setcfg(port.GPIO24, 1)
+gpio.setcfg(port.GPIO23, 0)
 
 n = 0
 while n < 5:
