@@ -5,6 +5,9 @@ import openai
 import config # This file contains the openai api key and board configuration
 import json
 
+from pyGPIO2.gpio import gpio, port
+from time import sleep
+
 # Audio refording parameters
 chunk = 512
 sample_format = pyaudio.paInt16
@@ -173,5 +176,16 @@ def run_arduino_code():
     os.system("sudo arduino-cli compile --fqbn arduino:avr:leonardo arduino_code")
     os.system("sudo arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:leonardo arduino_code")
 
+gpio.init()
+gpio.setcfg(port.GPIO24, 1)  #gpio4 as output
+
+n = 0
+while n < 5:
+	gpio.output(port.GPIO24, 1)
+	sleep(1)
+	gpio.output(port.GPIO24, 0)
+	sleep(1)
+	n +=1
+	
 # Start the keyboard listener
 listen()
