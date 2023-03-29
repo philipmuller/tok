@@ -2,7 +2,7 @@ import keychain
 
 openai_key = keychain.openai_key
 
-iterative = True # Set to False to make blank new requests every time
+iterative = False # Set to False to make blank new requests every time
 
 temperature = 0.4 # The higher the temperature, the more random the text. Between 0 and 1 is recommended.
 

@@ -38,24 +38,27 @@ def record():
 
 # This function listens for keyboard input
 def listen():
-    global recording
-    while True:
-        if gpio.input(port.GPIO23) == 1:
-            print('Recording...')
-
-            # Calling the record function on a different thread
-            record_thread = threading.Thread(target=record) 
-            record_thread.start()
-
-            while gpio.input(port.GPIO23) == 1:
-                pass
-
-            recording = False
-            record_thread.join()
-            print('Recording stopped.')
-            save_to_file()
-        if keyboard.is_pressed('q'):
-            break
+	global recording
+	setLEDRingState(0)
+	while True:
+		if gpio.input(port.GPIO18) == 1:
+			print('Recording...')
+			# Calling the record function on a different thread
+			record_thread = threading.Thread(target=record)
+			record_thread.start()
+			setLEDRingState(1)
+			
+			while gpio.input(port.GPIO18) == 1:
+				pass
+			
+			recording = False
+			record_thread.join()
+			print('Recording stopped.')
+			setLEDRingState(2)
+			save_to_file()
+			
+		if keyboard.is_pressed('q'):
+			break
 
 # Define the function to save the recorded audio to a file
 def save_to_file():
@@ -83,22 +86,16 @@ def create_transcription():
         generate_arduino_code(text)
 
 def generate_arduino_code(prompt):
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        temperature=config.temperature,
-        messages=[
-        {"role": "system", "content": "You are assisting a human with writing Arduino code. The Arduino is a Arduino Leonardo. You always have to output complete arduino code without additional text. Don't reply with anything but the code itself. Don't talk to the user directly, don't explain your code, just output the code itself. This is the request from the user:"},
-        {"role": "user", "content": prompt}
-        ],
-    )
-    print(response)
-    choices = response["choices"]
-    if len(choices) > 0:
-        choice = choices[0]
-        message = choice["message"]
-        content = message["content"]
-        print(content)
-        write_to_arduino_file(content)
+	setLEDRingState(3)
+	response = openai.ChatCompletion.create(model="gpt-3.5-turbo", temperature=config.temperature, messages=[{"role": "system", "content": "You are assisting a human with writing Arduino code. The Arduino is a Arduino Leonardo. You always have to output complete arduino code without additional text. Don't reply with anything but the code itself. Don't talk to the user directly, don't explain your code, just output the code itself. This is the request from the user:"}, {"role": "user", "content": prompt}],)
+	print(response)
+	choices = response["choices"]
+	if len(choices) > 0:
+		choice = choices[0]
+		message = choice["message"]
+		content = message["content"]
+		print(content)
+		write_to_arduino_file(content)
 
 def generate_arduino_code_test(prompt):
     history_file = "context/conversation_history.json"
@@ -161,7 +158,7 @@ def write_to_arduino_file(content):
     f.write(process_gpt_output(content))
     f.close()
     print("Saved new arduino file!")
-    sys.exit("Generation ended")
+    #sys.exit("Generation ended")
     run_arduino_code()
 
 def process_gpt_output(output):
@@ -173,20 +170,79 @@ def process_gpt_output(output):
     return output
 
 def run_arduino_code():
-    os.system("sudo arduino-cli compile --fqbn arduino:avr:leonardo arduino_code")
-    os.system("sudo arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:leonardo arduino_code")
+	setLEDRingState(4)
+	os.system("sudo arduino-cli compile --fqbn arduino:avr:leonardo arduino_code")
+	setLEDRingState(5)
+	os.system("sudo arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:leonardo arduino_code")
+	setLEDRingState(6)
+	sleep(2)
+	listen()
+
+def setRecordingState():
+	gpio.output(port.GPIO23, 1)
+	gpio.output(port.GPIO24, 0)
+	gpio.output(port.GPIO25, 0)
+	
+	
+def setLEDRingState(state):
+	print(f"SETTING STATE: {state}")
+	if state==0:
+		gpio.output(port.GPIO23, 0)
+		gpio.output(port.GPIO24, 0)
+		gpio.output(port.GPIO25, 0)
+	elif state==1:
+		gpio.output(port.GPIO23, 1)
+		gpio.output(port.GPIO24, 0)
+		gpio.output(port.GPIO25, 0)
+	elif state==2:
+		gpio.output(port.GPIO23, 0)
+		gpio.output(port.GPIO24, 1)
+		gpio.output(port.GPIO25, 0)
+	elif state==3:
+		gpio.output(port.GPIO23, 1)
+		gpio.output(port.GPIO24, 1)
+		gpio.output(port.GPIO25, 0)
+	elif state==4:
+		gpio.output(port.GPIO23, 0)
+		gpio.output(port.GPIO24, 0)
+		gpio.output(port.GPIO25, 1)
+	elif state==5:
+		gpio.output(port.GPIO23, 1)
+		gpio.output(port.GPIO24, 0)
+		gpio.output(port.GPIO25, 1)
+	elif state==6:
+		gpio.output(port.GPIO23, 0)
+		gpio.output(port.GPIO24, 1)
+		gpio.output(port.GPIO25, 1)
+	else:
+		gpio.output(port.GPIO23, 1)
+		gpio.output(port.GPIO24, 1)
+		gpio.output(port.GPIO25, 1)
+
 
 gpio.init()
+gpio.setcfg(port.GPIO23, 1)
 gpio.setcfg(port.GPIO24, 1)
-gpio.setcfg(port.GPIO23, 0)
+gpio.setcfg(port.GPIO25, 1)
+gpio.setcfg(port.GPIO18, 0)
 
-n = 0
-while n < 5:
-	gpio.output(port.GPIO24, 1)
-	sleep(1)
-	gpio.output(port.GPIO24, 0)
-	sleep(1)
-	n +=1
-	
+setLEDRingState(0)
+sleep(2)
+setLEDRingState(1)
+sleep(2)
+setLEDRingState(2)
+sleep(2)
+setLEDRingState(3)
+sleep(2)
+setLEDRingState(4)
+sleep(2)
+setLEDRingState(5)
+sleep(2)
+setLEDRingState(6)
+sleep(2)
+setLEDRingState(7)
+sleep(2)
+setLEDRingState(0)
+sleep(2)
 # Start the keyboard listener
 listen()
