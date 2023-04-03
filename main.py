@@ -83,7 +83,7 @@ def create_transcription():
     text = transcript["text"]
     print(text)
     if config.iterative:
-        generate_arduino_code_test(text)
+        generate_arduino_code_iteratively(text)
     else:
         generate_arduino_code(text)
 
@@ -99,59 +99,59 @@ def generate_arduino_code(prompt):
 		print(content)
 		write_to_arduino_file(content)
 
-def generate_arduino_code_test(prompt):
-    history_file = "context/conversation_history.json"
-
-    # Load conversation history from the file if it exists
-    if os.path.exists(history_file):
-        with open(history_file, "r") as f:
-            conversation_history = json.load(f)
-    else:
-        conversation_history = []
-
-    messages = [
-        {"role": "system", "content": f"{config.system_prompt}"}]
-
-    # Add the previous user and assistant messages to the messages array
-    for message in conversation_history:
-        messages.append(message)
-
-    # Add the user prompt to the messages array
-    user_message = {"role": "user", "content": prompt}
-    messages.append({"role": "user", "content": prompt})
-    conversation_history.append(user_message)
-
-    # Clear history
-    if "clear history" in user_message["content"].lower():
-        conversation_history = []
-        with open(history_file, "w") as f:
-            json.dump(conversation_history, f)
-        sys.exit("Conversation history cleared.")
-
-
-    response = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo",
-    temperature=config.temperature,
-    messages=messages
-    )
-    print(response)
-    choices = response["choices"]
-    if len(choices) > 0:
-        choice = choices[0]
-        message = choice["message"]
-        content = message["content"]
-        print(content)
-        conversation_history.append(message)
-
-    try:
-        with open(history_file, "w") as f:
-            print("opening history file")
-            json.dump(conversation_history, f)
-            f.close()
-    except Exception as e:
-        print("Error writing to history file:", e)
-
-    write_to_arduino_file(content)
+def generate_arduino_code_iteratively(prompt):
+	setLEDRingState(3)
+	history_file = "context/conversation_history.json"
+	conversation_history = []
+	
+	# Load conversation history from the file if it exists
+	if os.path.exists(history_file):
+		with open(history_file, "r") as f:
+			conversation_history = json.load(f)
+			
+	messages = [{"role": "system", "content": f"{config.system_prompt}"}]
+	
+	# Add the previous user and assistant messages to the messages array
+	for message in conversation_history:
+		messages.append(message)
+		
+	# Add the user prompt to the messages array
+	user_message = {"role": "user", "content": prompt}
+	messages.append(user_message)
+	conversation_history.append(user_message)
+	
+	# Clear history
+	if ("clear history" in user_message["content"].lower()) or ("new project" in user_message["content"].lower()):
+		conversation_history = []
+		with open(history_file, "w") as f:
+			json.dump(conversation_history, f)
+		
+		setLEDRingState(6)
+		sleep(1)
+		print("Conversation history cleared.")
+		listen()
+		
+	response = openai.ChatCompletion.create(model="gpt-3.5-turbo", temperature=config.temperature, messages=messages)
+	print(response)
+	choices = response["choices"]
+	if len(choices) > 0:
+		choice = choices[0]
+		message = choice["message"]
+		content = message["content"]
+		print(content)
+		conversation_history.append(message)
+		
+	try:
+		with open(history_file, "w") as f:
+			print("opening history file")
+			json.dump(conversation_history, f)
+			f.close()
+	except Exception as e:
+		print("Error writing to history file:", e)
+			
+	write_to_arduino_file(content)
+	
+    
 
 def write_to_arduino_file(content):
     print(content)
