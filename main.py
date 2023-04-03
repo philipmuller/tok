@@ -48,7 +48,9 @@ def listen():
 			record_thread.start()
 			setLEDRingState(1)
 			
-			while gpio.input(port.GPIO18) == 1:
+			sleep(1)
+			
+			while gpio.input(port.GPIO18) == 0:
 				pass
 			
 			recording = False
@@ -226,19 +228,7 @@ gpio.setcfg(port.GPIO24, 1)
 gpio.setcfg(port.GPIO25, 1)
 gpio.setcfg(port.GPIO18, 0)
 
-setLEDRingState(0)
-sleep(2)
-setLEDRingState(1)
-sleep(2)
-setLEDRingState(2)
-sleep(2)
-setLEDRingState(3)
-sleep(2)
-setLEDRingState(4)
-sleep(2)
-setLEDRingState(5)
-sleep(2)
-setLEDRingState(6)
+
 sleep(2)
 setLEDRingState(7)
 sleep(2)
